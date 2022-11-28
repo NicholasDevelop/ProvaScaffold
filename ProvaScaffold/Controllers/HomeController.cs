@@ -47,13 +47,17 @@ namespace ProvaScaffold.Controllers
         [HttpPost]
         public IActionResult Search(ProductRequest productRequest)
         {
-            Product? product = _context.Products.Where(p => p.Name.Contains(productRequest) && p.ListPrice == productRequest.ListPrice);
-            if(product == null)
+            decimal minPrice = productRequest.minPrice;
+            decimal maxPrice = productRequest.maxPrice;
+            var products = _context.Products.Where(p => p.Name.Contains(productRequest.Name) 
+                && p.ListPrice > minPrice && p.ListPrice < maxPrice).OrderBy(p => p.ListPrice).ToList();
+            
+            if (!products.Any())
             {
                 return NotFound();
             }
 
-            return Ok(product);
+            return Ok(products);
         }
     }
 }
