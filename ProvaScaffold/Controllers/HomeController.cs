@@ -49,15 +49,18 @@ namespace ProvaScaffold.Controllers
         {
             decimal minPrice = productRequest.minPrice;
             decimal maxPrice = productRequest.maxPrice;
+
             var products = _context.Products.Where(p => p.Name.Contains(productRequest.Name) 
                 && p.ListPrice > minPrice && p.ListPrice < maxPrice).OrderBy(p => p.ListPrice).ToList();
-            
-            if (!products.Any())
-            {
-                return NotFound();
-            }
+            var numberSearchProduct = products.Count();
 
-            return Ok(products);
+            products = products.Skip(productRequest.ElementInPage*(productRequest.PageIndex-1)).Take(productRequest.ElementInPage).ToList();            
+
+            ProductResponse productResponse = new ProductResponse();
+            productResponse.TotElement = numberSearchProduct;
+            productResponse.Products = products;
+
+            return Ok(productResponse);
         }
     }
 }
